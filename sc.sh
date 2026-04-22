@@ -21,19 +21,37 @@ sudo systemctl start docker
 sudo systemctl enable docker
 
 echo "Adding the current user to the Docker group..."
-# On EC2, this is typically the 'ec2-user'
 sudo usermod -aG docker $USER
 
+# Determine architecture for binary downloads
+ARCH=$(uname -m)
+case $ARCH in
+    x86_64) PLUGIN_ARCH="amd64" ;;
+    aarch64) PLUGIN_ARCH="arm64" ;;
+    *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+esac
+
+echo "Installing Docker Buildx..."
+# Fetch the latest release version dynamically
+BUILDX_VERSION=$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+
+# Fallback to v0.17.1 if GitHub API rate limit is exceeded
+if [ -z "$BUILDX_VERSION" ]; then
+    BUILDX_VERSION="v0.17.1"
+fi
+
+# Install Buildx as a system-wide Docker CLI plugin
+sudo mkdir -p /usr/libexec/docker/cli-plugins
+sudo curl -SL "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${PLUGIN_ARCH}" -o /usr/libexec/docker/cli-plugins/docker-buildx
+sudo chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
+
 echo "Installing Docker Compose..."
-# Downloads the latest release binary for the specific architecture (x86_64 or aarch64)
 sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-echo "Applying executable permissions to Docker Compose..."
 sudo chmod +x /usr/local/bin/docker-compose
-
-# Create a symlink just in case /usr/local/bin isn't in the path for some services
 sudo ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 echo "--- Installation Complete! ---"
 docker --version
 docker-compose --version
+docker buildx version
+
