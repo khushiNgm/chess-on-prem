@@ -25,7 +25,7 @@ services:
     environment:
       PORT: "8080"
       # Use PUBLIC_HOST for single-EC2 access from outside. Defaults to localhost.
-      FRONTEND_URL: "http://127.0.0.1:5173"
+      FRONTEND_URL: "http://54.146.37.122:5173"
       MONGODB_URL: "mongodb://mongo:27017/64"
       REDIS_URL: "redis://redis:6379"
     command: npm run start:main
@@ -44,7 +44,7 @@ services:
       - ./server/.env
     environment:
       PORT: "9090"
-      FRONTEND_URL: "http://127.0.0.1:5173"
+      FRONTEND_URL: "http://54.146.37.122:5173"
       MONGODB_URL: "mongodb://mongo:27017/64"
       REDIS_URL: "redis://redis:6379"
     command: npm run start:ws
@@ -63,7 +63,7 @@ services:
       - ./server/.env
     environment:
       PORT: "8081"
-      FRONTEND_URL: "http://127.0.0.1:5173"
+      FRONTEND_URL: "http://54.146.37.122:5173"
       MONGODB_URL: "mongodb://mongo:27017/64"
       REDIS_URL: "redis://redis:6379"
       # Optional override if you want a specific Stockfish binary:
@@ -83,7 +83,7 @@ services:
     env_file:
       - ./server/.env
     environment:
-      FRONTEND_URL: "http://127.0.0.1:5173"
+      FRONTEND_URL: "http://54.146.37.122:5173"
       MONGODB_URL: "mongodb://mongo:27017/64"
       REDIS_URL: "redis://redis:6379"
     command: npm run start:microservice:dbupdates
@@ -102,9 +102,9 @@ services:
       - ./client/.env
     environment:
       # These URLs are used by the browser. Use PUBLIC_HOST for single-EC2 access.
-      VITE_API_URL: "http://127.0.0.1:8080"
-      VITE_GAME_SERVER_API_URL: "http://127.0.0.1:9090"
-      VITE_STOCKFISH_SERVER_API_URL: "http://127.0.0.1:8081"
+      VITE_API_URL: "http://54.146.37.122:8080"
+      VITE_GAME_SERVER_API_URL: "http://54.146.37.122:9090"
+      VITE_STOCKFISH_SERVER_API_URL: "http://54.146.37.122:8081"
     command: npm run dev -- --host 0.0.0.0 --port 5173
     depends_on:
       - server-main
