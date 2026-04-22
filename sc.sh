@@ -6,7 +6,9 @@ set -e
 echo "Updating system packages..."
 sudo yum update -y
 
-echo "Installing Docker..."
+echo "========================================="
+echo "       INSTALLING DOCKER ENGINE          "
+echo "========================================="
 # Check OS version to determine the correct installation method
 if grep -q "Amazon Linux 2023" /etc/os-release; then
     echo "Detected Amazon Linux 2023. Using dnf..."
@@ -23,6 +25,9 @@ sudo systemctl enable docker
 echo "Adding the current user to the Docker group..."
 sudo usermod -aG docker $USER
 
+echo "========================================="
+echo "       INSTALLING DOCKER BUILDX          "
+echo "========================================="
 # Determine architecture for binary downloads
 ARCH=$(uname -m)
 case $ARCH in
@@ -31,7 +36,6 @@ case $ARCH in
     *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
 esac
 
-echo "Installing Docker Buildx..."
 # Fetch the latest release version dynamically
 BUILDX_VERSION=$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
@@ -45,30 +49,38 @@ sudo mkdir -p /usr/libexec/docker/cli-plugins
 sudo curl -SL "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${PLUGIN_ARCH}" -o /usr/libexec/docker/cli-plugins/docker-buildx
 sudo chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
 
-echo "Installing Docker Compose..."
+echo "========================================="
+echo "       INSTALLING DOCKER COMPOSE         "
+echo "========================================="
 sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 sudo ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-echo "Setting up environment files..."
-# Rename .env.example to .env in client directory
-if [ -f "client/.env.example" ] && [ ! -f "client/.env" ]; then
-    mv client/.env.example client/.env
-    echo "Renamed client/.env.example to client/.env"
-elif [ -f "client/.env" ]; then
-    echo "client/.env already exists, skipping..."
-fi
+echo "========================================="
+echo "       INSTALLING NODE.JS & NPM          "
+echo "========================================="
+# Install NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
-# Rename .env.example to .env in server directory
-if [ -f "server/.env.example" ] && [ ! -f "server/.env" ]; then
-    mv server/.env.example server/.env
-    echo "Renamed server/.env.example to server/.env"
-elif [ -f "server/.env" ]; then
-    echo "server/.env already exists, skipping..."
-fi
+# Load NVM directly in the script so we can use it immediately
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-echo "--- Installation Complete! ---"
+# Install the latest LTS version of Node.js (which includes npm)
+nvm install --lts
+
+echo "========================================="
+echo "       INSTALLATION COMPLETE!            "
+echo "========================================="
 docker --version
 docker-compose --version
 docker buildx version
+node -v
+npm -v
 
+echo ""
+echo "################################################################################"
+echo "IMPORTANT FINAL STEPS:"
+echo "1. To apply the new Docker permissions, run: newgrp docker"
+echo "2. To apply the new NPM/Node variables to your terminal, run: source ~/.bashrc"
+echo "################################################################################"
