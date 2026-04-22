@@ -50,6 +50,23 @@ sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 sudo ln -sf /usr/local/bin/docker-compose /usr/bin/docker-compose
 
+echo "Setting up environment files..."
+# Rename .env.example to .env in client directory
+if [ -f "client/.env.example" ] && [ ! -f "client/.env" ]; then
+    mv client/.env.example client/.env
+    echo "Renamed client/.env.example to client/.env"
+elif [ -f "client/.env" ]; then
+    echo "client/.env already exists, skipping..."
+fi
+
+# Rename .env.example to .env in server directory
+if [ -f "server/.env.example" ] && [ ! -f "server/.env" ]; then
+    mv server/.env.example server/.env
+    echo "Renamed server/.env.example to server/.env"
+elif [ -f "server/.env" ]; then
+    echo "server/.env already exists, skipping..."
+fi
+
 echo "--- Installation Complete! ---"
 docker --version
 docker-compose --version
