@@ -8,7 +8,7 @@
 #### Installation
 1. Clone the repository:   
 ```bash
-git clone https://github.com/pushkar-iamops/chess-on-prem.git
+git clone https://github.com/pushkar-khatavkar/chess-on-prem.git
 ```
 2. Install dependencies for both the client and server:
 ```bash
