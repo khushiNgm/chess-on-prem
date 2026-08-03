@@ -39,4 +39,4 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 sync client/dist s3://frontend-chess-application --delete
+          aws s3 sync client/dist s3://frontend-chess-app --delete
