@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies and build app
         run: |
-          cd client
+          cd  /home/runner/work/chess-on-prem/chess-on-prem/client
           npm install
           npm run build
 
