@@ -15,8 +15,6 @@ jobs:
       - name: Verify checkout
         run: |
            pwd
-           ls -la
-           cd chess-on-prem
            ls 
 
       - name: Set up AWS credentials
@@ -33,9 +31,13 @@ jobs:
 
       - name: Install dependencies and build app
         run: |
-          cd  /home/runner/work/chess-on-prem/chess-on-prem/client
+          cd  client
           npm install
           npm run build
+          
+      - name: Verify files output
+        run: |
+          ls -la client
 
       - name: Deploy to S3
         run: |
